@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KababayanQueue | Find your gaming squad fast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="LFG-style.css">
+</head>
+<body>
+<header class="bar">
+  <a class="logo" href="#" data-view="home">KABABAYAN<span>QUEUE</span></a>
+  <nav>
+    <button class="btn" data-view="browse">Browse Groups</button>
+    <button class="btn" data-view="mine">My LFG</button>
+    <button class="btn red" id="newBtn">+ LFG</button>
+    <button class="btn ghost" id="userBtn">Hi, Player</button>
+    <!-- Only shown to real admins (a doc admins/<uid> exists in Firestore) -->
+    <button class="btn ghost" id="adminBtn" hidden>Admin: OFF</button>
+  </nav>
+</header>
+
+<main>
+<section id="home" class="view">
+  <div class="hero">
+    <h1>FIND YOUR GAMING SQUAD FAST</h1>
+    <p class="tagline">Find your kababayan, queue up, and play.</p>
+    <form id="homeSearch" class="search">
+      <input id="q" placeholder="Search LFG posts..." aria-label="Search LFG posts">
+      <button aria-label="Search"><svg viewBox="0 0 24 24" width="26" height="26"><circle cx="10" cy="10" r="6.5" fill="none" stroke="#000" stroke-width="2.5"/><path d="M15 15l6 6" stroke="#000" stroke-width="3"/></svg></button>
+    </form>
+    <div class="fchips chips"></div>
+  </div>
+
+  <div class="wrap">
+    <!-- TRAY: Recommended groups (suggestions only) -->
+    <section class="tray" aria-labelledby="recTitle">
+      <div class="tray-head"><h2 id="recTitle"> RECOMMENDED GROUPS </h2><span class="count" id="recCount">0</span></div>
+      <div class="tray-body"><div id="recs" class="grid"></div></div>
+    </section>
+
+    <h2>"I just need one teammate. Why is it taking 20 minutes?"</h2>
+    <div class="feats">
+      <div class="feat"><svg viewBox="0 0 40 40"><rect x="4" y="4" width="32" height="32" fill="#fcd116" stroke="#000" stroke-width="3"/><path d="M10 14h20M10 20h20M10 26h12" stroke="#000" stroke-width="3"/></svg><h3>Posts that say everything</h3><p>Game, activity, schedule, player slots and requirements. No more guessing in group chats.</p></div>
+      <div class="feat"><svg viewBox="0 0 40 40"><rect x="4" y="4" width="32" height="32" fill="#ce1126" stroke="#000" stroke-width="3"/><path d="M12 21l6 6 11-13" stroke="#fff" stroke-width="4" fill="none"/></svg><h3>Join in one tap</h3><p>Send your UID, IGN or party link. The host accepts or declines, and you can cancel anytime.</p></div>
+      <div class="feat"><svg viewBox="0 0 40 40"><rect x="4" y="4" width="32" height="32" fill="#0038a8" stroke="#000" stroke-width="3"/><path d="M13 9v22M13 10h16l-4 6 4 6H13" stroke="#fff" stroke-width="3" fill="#fff"/></svg><h3>Safe queues</h3><p>Flag bad posts and block players so they never show up in your queue again.</p></div>
+    </div>
+
+    <h2> LIVE FROM THE QUEUE </h2>
+    <div class="marquee" aria-label="Animated preview of groups filling up"><div id="demo" class="track"></div></div>
+  </div>
+
+  <div class="quote"><p>Finding one compatible teammate should not take away the time meant for playing.</p></div>
+
+  <div class="wrap">
+    <details class="terms" id="terms">
+      <summary>Terms and Conditions</summary>
+      <ol>
+        <li>You must be 13 or older. Use your real in-game details only.</li>
+        <li>Be respectful. Harassment, hate speech, scams and spam are not allowed.</li>
+        <li>Only share your UID, IGN or party link with players you choose to accept.</li>
+        <li>Flagged posts are closed and hidden from other players until an admin reviews them. Admins may remove them without notice.</li>
+        <li>Blocking is private. Blocked players will not appear in your queue.</li>
+        <li>KababayanQueue is a fan-made community tool and is not affiliated with HoYoverse, Riot Games or Roblox.</li>
+      </ol>
+    </details>
+  </div>
+</section>
+
+<section id="browse" class="view wrap" hidden>
+  <!-- TRAY: Available groups (search + filter bar inside the tray) -->
+  <section class="tray" aria-labelledby="listTitle">
+    <div class="tray-head"><h2 id="listTitle">AVAILABLE GROUPS </h2><span class="count" id="listCount">0</span></div>
+    <div class="tray-tools">
+      <input id="q2" class="bigin" placeholder="Search LFG posts..." aria-label="Search LFG posts">
+      <div class="fchips chips"></div>
+    </div>
+    <div class="tray-body"><div id="list" class="grid"></div></div>
+  </section>
+</section>
+
+<section id="mine" class="view wrap" hidden>
+  <!-- TRAY: Admin only (shown when admin mode is ON) -->
+  <section class="tray admin" id="adminTray" hidden aria-labelledby="adminTitle">
+    <div class="tray-head"><h2 id="adminTitle">Admin: flagged posts</h2><span class="count" id="adminCount">0</span></div>
+    <div class="tray-body"><div id="adminOut" class="grid"></div></div>
+  </section>
+
+  <!-- TRAY: Manage group (posts I host: update UID/IGN/party link, delete) -->
+  <section class="tray navy" aria-labelledby="hostTitle">
+    <div class="tray-head"><h2 id="hostTitle"> MANAGE GROUP </h2><span class="count" id="hostCount">0</span></div>
+    <div class="tray-body"><div id="hostOut" class="grid"></div></div>
+  </section>
+
+  <!-- TRAY: Join requests (requests sent to my posts: accept / decline) -->
+  <section class="tray navy" aria-labelledby="reqTitle">
+    <div class="tray-head"><h2 id="reqTitle"> JOIN REQUESTS </h2><span class="count" id="reqCount">0</span></div>
+    <div class="tray-body"><div id="reqOut"></div></div>
+  </section>
+
+  <!-- TRAY: Groups I joined / requested -->
+  <section class="tray navy" aria-labelledby="joinTitle">
+    <div class="tray-head"><h2 id="joinTitle"> JOINED GROUPS </h2><span class="count" id="joinCount">0</span></div>
+    <div class="tray-body"><div id="joinOut" class="grid"></div></div>
+  </section>
+
+  <!-- TRAY: Blocked players -->
+  <section class="tray navy" aria-labelledby="blockTitle">
+    <div class="tray-head"><h2 id="blockTitle"> BLOCKED PLAYERS </h2><span class="count" id="blockCount">0</span></div>
+    <div class="tray-body"><div id="blockOut"></div></div>
+  </section>
+</section>
+</main>
+
+<footer class="foot"><span>KababayanQueue &copy; 2026</span><span> Made for Filipino Gamers </span></footer>
+<dialog id="dlg"></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+<script type="module" src="LFG-function.js"></script>
+</body>
+</html>
