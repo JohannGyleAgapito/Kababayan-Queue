@@ -64,7 +64,7 @@ h1,h2,h3,.logo,.eyebrow,.count { font-family:var(--px); line-height:1.5; font-we
   display:inline-flex; align-items:center; gap:10px;
   font-size:13px; color:var(--yellow); text-decoration:none;
   padding:11px 16px; border-radius:10px;
-  background:var(--navy) url("kq-hero-pixels.svg") 0 0 / 320px 320px;
+  background:linear-gradient(rgba(10,22,54,.62),rgba(10,22,54,.62)), url("kq-hero-pixels.svg") 0 0 / 320px 320px var(--navy);
   border:2px solid var(--navy); box-shadow:3px 3px 0 rgba(10,22,54,.35);
 }
 .logo span { color:#fff }
@@ -194,7 +194,7 @@ main { position:relative; flex:1; min-height:0; padding:8px 24px 8px }
 .count { display:inline-grid; place-items:center; min-width:30px; height:28px; padding:0 8px; border-radius:6px; background:var(--yellow); color:var(--navy); border:2px solid var(--navy); font-size:10px }
 .empty { margin:0; color:var(--muted); font-size:18px }
 
-.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:18px }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(270px,100%),1fr)); gap:18px }
 
 /* ===== MY LFG: vertical rail + one tray at a time ===== */
 .mine { display:grid; grid-template-columns:270px minmax(0,1fr); gap:20px; height:100% }
@@ -306,36 +306,57 @@ dialog ol { margin:12px 0 0; padding-left:22px; color:var(--muted); line-height:
 .demo-badge { padding:2px 10px; border-radius:6px; font-size:13px; font-weight:700; color:#fff; background:var(--red); border:2px solid var(--red) }
 
 /* ===== RESPONSIVE ===== */
+/* Tablets + phones: the PAGE scrolls normally. Trays grow with their content. */
 @media (max-width:900px) {
-  main { padding:6px 14px 6px }
-  .bar { padding:12px 14px 6px; gap:10px; flex-wrap:nowrap }      /* logo left, buttons right, like desktop */
-  .foot { padding:6px 14px 10px; font-size:13px }
-  nav .btn { padding:6px 12px; font-size:14px }
-  .home { grid-template-columns:1fr; grid-template-rows:auto minmax(0,1fr); gap:18px }
+  html, body { height:auto }
+  body { min-height:100vh; min-height:100dvh; overflow-x:hidden; overflow-y:auto }
+  main { flex:1 0 auto; min-height:0; padding:6px 14px 14px }
+  .view { height:auto }
+  #login { overflow:visible; place-items:start center; padding:8px 0 }
+
+  .bar { padding:12px 14px 6px; gap:10px }
+  .foot { padding:8px 14px calc(12px + env(safe-area-inset-bottom)); font-size:13px }
+
+  .home { grid-template-columns:1fr; grid-template-rows:auto; height:auto; gap:18px }
   .hero { justify-content:flex-start }
   .hero h1 { font-size:16px; margin-bottom:10px }
   .tagline, .perks { display:none }
   .search { margin-bottom:12px }
-  .mine { grid-template-columns:1fr; grid-template-rows:auto minmax(0,1fr); gap:12px }
-  .rail { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); grid-auto-rows:min-content; align-content:start; gap:10px; overflow:visible; padding:0 4px 4px 0 }
-  .rail-btn { min-width:0; padding:10px 12px; align-items:center }
+
+  .tray { height:auto; overflow:visible }
+  .tray-head { padding:14px 16px }
+  .tray-tools { padding:14px 16px 12px }
+  .tray-body { overflow:visible; padding:14px }
+
+  .mine { grid-template-columns:1fr; grid-template-rows:auto; height:auto; gap:14px }
+  .panes { height:auto }
+  .rail { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; overflow:visible; padding:0 4px 4px 0 }
+  .rail-btn { min-width:0; min-height:56px; padding:10px 12px; align-items:center }
   .rail-btn small { display:none }
   .rail-btn .count { grid-row:1 }
-  .tray-body { padding:14px }
+  .rail-btn:last-child:nth-child(odd) { grid-column:1 / -1 }   /* Admin tab spans the full row when shown */
 }
-@media (max-width:760px) {                /* phones: logo on top, ONE row of equal buttons below (labels wrap if needed) */
+
+/* Phones: logo on top, nav buttons in a tidy 2-column grid with big tap targets */
+@media (max-width:760px) {
   .bar { flex-direction:column; align-items:stretch }
   .logo { align-self:flex-start }
-  nav { gap:6px }                          /* still one equal-width column per button */
-  nav .btn { min-height:46px; padding:4px 5px; font-size:clamp(10px,3.1vw,14px); line-height:1.1; text-align:center;
-             white-space:normal; overflow-wrap:anywhere; box-shadow:2px 2px 0 var(--navy) }
+  nav { grid-auto-flow:row; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px }
+  nav .btn { min-height:48px; padding:8px 10px; font-size:14px; line-height:1.1; text-align:center;
+             white-space:nowrap; overflow:hidden; text-overflow:ellipsis; box-shadow:3px 3px 0 var(--navy) }
+  nav .btn:last-child:nth-child(odd) { grid-column:1 / -1 }    /* Admin button spans the full row when shown */
+  .row .btn { flex:1 1 100% }                                   /* card action buttons stack full-width */
 }
+
 @media (max-width:520px) {
   .logo { font-size:10px; padding:8px 12px }
-  .btn { padding:6px 11px; font-size:13px }
-  .rail { grid-template-columns:repeat(2,minmax(0,1fr)) }
+  .btn { padding:8px 12px; font-size:14px }
+  .search { padding:4px 4px 4px 14px }
+  .search input { font-size:17px }
   .rail-btn b { font-size:9px }
   .foot > * { padding:4px 10px }
+  .card { padding:14px }
+  .req { gap:6px }
 }
 @media (prefers-reduced-motion:reduce) { * { transition:none!important } }
 .reqgroup[data-g="red"] { --c:var(--red); --cd:var(--red) }
