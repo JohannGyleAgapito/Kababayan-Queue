@@ -1,2 +1,2 @@
 # Kababayan Queue
-An LFG Website made for gamers 
+A Looking For Group Platform MAde for Gamers
