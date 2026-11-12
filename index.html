@@ -5,117 +5,135 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>KababayanQueue | Find your gaming squad fast</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="LFG-style.css">
+<link rel="stylesheet" href="LFG-style.css?v=4">
 </head>
-<body>
+<body class="booting">
+
+<!-- Floating header: transparent, fixed. Only the buttons are visible. -->
 <header class="bar">
-  <a class="logo" href="#" data-view="home">KABABAYAN<span>QUEUE</span></a>
+  <a class="logo" href="#" data-view="home"><i class="dot"></i>KABABAYAN<span>QUEUE</span></a>
   <nav>
     <button class="btn" data-view="browse">Browse Groups</button>
     <button class="btn" data-view="mine">My LFG</button>
-    <button class="btn red" id="newBtn">+ LFG</button>
-    <button class="btn ghost" id="userBtn">Hi, Player</button>
+    <button class="btn primary" id="newBtn">+ LFG</button>
+    <button class="btn" id="userBtn">Hi, Player</button>
     <!-- Only shown to real admins (a doc admins/<uid> exists in Firestore) -->
     <button class="btn ghost" id="adminBtn" hidden>Admin: OFF</button>
   </nav>
 </header>
 
 <main>
-<section id="home" class="view">
-  <div class="hero">
-    <h1>FIND YOUR GAMING SQUAD FAST</h1>
-    <p class="tagline">Find your kababayan, queue up, and play.</p>
-    <form id="homeSearch" class="search">
-      <input id="q" placeholder="Search LFG posts..." aria-label="Search LFG posts">
-      <button aria-label="Search"><svg viewBox="0 0 24 24" width="26" height="26"><circle cx="10" cy="10" r="6.5" fill="none" stroke="#000" stroke-width="2.5"/><path d="M15 15l6 6" stroke="#000" stroke-width="3"/></svg></button>
-    </form>
-    <div class="fchips chips"></div>
-  </div>
-
-  <div class="wrap">
-    <!-- TRAY: Recommended groups (suggestions only) -->
-    <section class="tray" aria-labelledby="recTitle">
-      <div class="tray-head"><h2 id="recTitle"> RECOMMENDED GROUPS </h2><span class="count" id="recCount">0</span></div>
-      <div class="tray-body"><div id="recs" class="grid"></div></div>
-    </section>
-
-    <h2>"I just need one teammate. Why is it taking 20 minutes?"</h2>
-    <div class="feats">
-      <div class="feat"><svg viewBox="0 0 40 40"><rect x="4" y="4" width="32" height="32" fill="#fcd116" stroke="#000" stroke-width="3"/><path d="M10 14h20M10 20h20M10 26h12" stroke="#000" stroke-width="3"/></svg><h3>Posts that say everything</h3><p>Game, activity, schedule, player slots and requirements. No more guessing in group chats.</p></div>
-      <div class="feat"><svg viewBox="0 0 40 40"><rect x="4" y="4" width="32" height="32" fill="#ce1126" stroke="#000" stroke-width="3"/><path d="M12 21l6 6 11-13" stroke="#fff" stroke-width="4" fill="none"/></svg><h3>Join in one tap</h3><p>Send your UID, IGN or party link. The host accepts or declines, and you can cancel anytime.</p></div>
-      <div class="feat"><svg viewBox="0 0 40 40"><rect x="4" y="4" width="32" height="32" fill="#0038a8" stroke="#000" stroke-width="3"/><path d="M13 9v22M13 10h16l-4 6 4 6H13" stroke="#fff" stroke-width="3" fill="#fff"/></svg><h3>Safe queues</h3><p>Flag bad posts and block players so they never show up in your queue again.</p></div>
+<!-- ================= 1. LOGIN (first screen) ================= -->
+<section id="login" class="view">
+  <div class="auth">
+    <p class="eyebrow">Welcome, kababayan</p>
+    <h1>Log in to start queueing</h1>
+    <div class="seg" id="authTabs" role="tablist">
+      <button type="button" class="on" data-mode="in">Sign in</button>
+      <button type="button" data-mode="up">Create account</button>
     </div>
-
-    <h2> LIVE FROM THE QUEUE </h2>
-    <div class="marquee" aria-label="Animated preview of groups filling up"><div id="demo" class="track"></div></div>
-  </div>
-
-  <div class="quote"><p>Finding one compatible teammate should not take away the time meant for playing.</p></div>
-
-  <div class="wrap">
-    <details class="terms" id="terms">
-      <summary>Terms and Conditions</summary>
-      <ol>
-        <li>You must be 13 or older. Use your real in-game details only.</li>
-        <li>Be respectful. Harassment, hate speech, scams and spam are not allowed.</li>
-        <li>Only share your UID, IGN or party link with players you choose to accept.</li>
-        <li>Flagged posts are closed and hidden from other players until an admin reviews them. Admins may remove them without notice.</li>
-        <li>Blocking is private. Blocked players will not appear in your queue.</li>
-        <li>KababayanQueue is a fan-made community tool and is not affiliated with HoYoverse, Riot Games or Roblox.</li>
-      </ol>
-    </details>
+    <form id="authForm" novalidate>
+      <label id="nameL" hidden>Display name<input name="name" maxlength="24" autocomplete="nickname" placeholder="How should players call you?"></label>
+      <label>Email<input type="email" name="email" required autocomplete="email" placeholder="you@email.com"></label>
+      <label>Password<input type="password" name="pw" required minlength="6" autocomplete="current-password" placeholder="At least 6 characters"></label>
+      <p id="authErr" class="err" role="alert" hidden></p>
+      <button class="btn primary wide" id="authGo">Sign in</button>
+    </form>
+    <div class="or"><span>or</span></div>
+    <button type="button" class="btn wide gbtn" id="googleBtn"><svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Continue with Google</button>
+    <button type="button" class="btn wide" id="guestBtn">Continue as guest</button>
+    <p class="fine">By continuing you agree to the <button type="button" class="link" data-terms>Terms and Conditions</button>.</p>
   </div>
 </section>
 
-<section id="browse" class="view wrap" hidden>
-  <!-- TRAY: Available groups (search + filter bar inside the tray) -->
+<!-- ================= 2. LANDING ================= -->
+<section id="home" class="view" hidden>
+  <div class="home">
+    <div class="hero">
+      <p class="eyebrow">Filipino gamer LFG</p>
+      <h1>Find your gaming squad <em>fast</em></h1>
+      <p class="tagline">Find your kababayan, queue up, and play.</p>
+      <form id="homeSearch" class="search">
+        <label class="sr-only" for="q">Search LFG posts</label>
+        <input id="q" name="q" type="search" autocomplete="off" placeholder="Search LFG posts...">
+        <button aria-label="Search"><svg viewBox="0 0 24 24" width="22" height="22"><circle cx="10" cy="10" r="6.5" fill="none" stroke="#fff" stroke-width="2.4"/><path d="M15 15l6 6" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg></button>
+      </form>
+      <div class="fchips chips"></div>
+      <ul class="perks">
+        <li><i>1</i><div><b>Posts that say everything</b><span>Game, activity, schedule, slots and requirements.</span></div></li>
+        <li><i>2</i><div><b>Join in one tap</b><span>Send your UID, IGN or party link. Cancel anytime.</span></div></li>
+        <li><i>3</i><div><b>Safe queues</b><span>Flag bad posts and block players for good.</span></div></li>
+      </ul>
+    </div>
+
+    <!-- TRAY: Recommended groups. The only scrolling area on the landing page. -->
+    <section class="tray" aria-labelledby="recTitle">
+      <div class="tray-head"><div><h2 id="recTitle">Recommended groups</h2><p>Picked for you, closest start time first</p></div><span class="count" id="recCount">0</span></div>
+      <div class="tray-body"><div id="recs" class="grid"></div></div>
+    </section>
+  </div>
+</section>
+
+<!-- ================= BROWSE ================= -->
+<section id="browse" class="view" hidden>
   <section class="tray" aria-labelledby="listTitle">
-    <div class="tray-head"><h2 id="listTitle">AVAILABLE GROUPS </h2><span class="count" id="listCount">0</span></div>
+    <div class="tray-head"><div><h2 id="listTitle">Available groups</h2><p>Search or filter by game</p></div><span class="count" id="listCount">0</span></div>
     <div class="tray-tools">
-      <input id="q2" class="bigin" placeholder="Search LFG posts..." aria-label="Search LFG posts">
+      <label class="sr-only" for="q2">Search LFG posts</label>
+      <input id="q2" name="q2" type="search" class="bigin" autocomplete="off" placeholder="Search LFG posts...">
       <div class="fchips chips"></div>
     </div>
     <div class="tray-body"><div id="list" class="grid"></div></div>
   </section>
 </section>
 
-<section id="mine" class="view wrap" hidden>
-  <!-- TRAY: Admin only (shown when admin mode is ON) -->
-  <section class="tray admin" id="adminTray" hidden aria-labelledby="adminTitle">
-    <div class="tray-head"><h2 id="adminTitle">Admin: flagged posts</h2><span class="count" id="adminCount">0</span></div>
-    <div class="tray-body"><div id="adminOut" class="grid"></div></div>
-  </section>
+<!-- ================= MY LFG: vertical trays labeled by purpose ================= -->
+<section id="mine" class="view" hidden>
+  <div class="mine">
+    <nav class="rail" aria-label="My LFG sections">
+      <button class="rail-btn on" data-tab="host"><b>Manage Group</b><small>Posts you host</small><span class="count" id="hostCount">0</span></button>
+      <button class="rail-btn" data-tab="req"><b>Join Requests</b><small>Players asking to join</small><span class="count" id="reqCount">0</span></button>
+      <button class="rail-btn" data-tab="join"><b>Joined Groups</b><small>Groups you applied to</small><span class="count" id="joinCount">0</span></button>
+      <button class="rail-btn" data-tab="block"><b>Blocked Players</b><small>People you muted</small><span class="count" id="blockCount">0</span></button>
+      <button class="rail-btn" data-tab="admin" id="adminTab" hidden><b>Admin: Flagged</b><small>Posts to review</small><span class="count" id="adminCount">0</span></button>
+    </nav>
 
-  <!-- TRAY: Manage group (posts I host: update UID/IGN/party link, delete) -->
-  <section class="tray navy" aria-labelledby="hostTitle">
-    <div class="tray-head"><h2 id="hostTitle"> MANAGE GROUP </h2><span class="count" id="hostCount">0</span></div>
-    <div class="tray-body"><div id="hostOut" class="grid"></div></div>
-  </section>
-
-  <!-- TRAY: Join requests (requests sent to my posts: accept / decline) -->
-  <section class="tray navy" aria-labelledby="reqTitle">
-    <div class="tray-head"><h2 id="reqTitle"> JOIN REQUESTS </h2><span class="count" id="reqCount">0</span></div>
-    <div class="tray-body"><div id="reqOut"></div></div>
-  </section>
-
-  <!-- TRAY: Groups I joined / requested -->
-  <section class="tray navy" aria-labelledby="joinTitle">
-    <div class="tray-head"><h2 id="joinTitle"> JOINED GROUPS </h2><span class="count" id="joinCount">0</span></div>
-    <div class="tray-body"><div id="joinOut" class="grid"></div></div>
-  </section>
-
-  <!-- TRAY: Blocked players -->
-  <section class="tray navy" aria-labelledby="blockTitle">
-    <div class="tray-head"><h2 id="blockTitle"> BLOCKED PLAYERS </h2><span class="count" id="blockCount">0</span></div>
-    <div class="tray-body"><div id="blockOut"></div></div>
-  </section>
+    <div class="panes">
+      <section class="tray pane on" data-pane="host">
+        <div class="tray-head"><div><h2>Manage Group</h2><p>Update your UID / IGN / party link or delete a post</p></div></div>
+        <div class="tray-body"><div id="hostOut" class="grid"></div></div>
+      </section>
+      <section class="tray pane" data-pane="req">
+        <div class="tray-head"><div><h2>Join Requests</h2><p>Accept, decline or block players asking to join your groups</p></div></div>
+        <div class="tray-body"><div id="reqOut"></div></div>
+      </section>
+      <section class="tray pane" data-pane="join">
+        <div class="tray-head"><div><h2>Joined Groups</h2><p>Groups you requested or were accepted into</p></div></div>
+        <div class="tray-body"><div id="joinOut" class="grid"></div></div>
+      </section>
+      <section class="tray pane" data-pane="block">
+        <div class="tray-head"><div><h2>Blocked Players</h2><p>They will never appear in your queue</p></div></div>
+        <div class="tray-body"><div id="blockOut"></div></div>
+      </section>
+      <section class="tray pane" data-pane="admin">
+        <div class="tray-head"><div><h2>Admin: Flagged posts</h2><p>Dismiss flags or delete the post</p></div></div>
+        <div class="tray-body"><div id="adminOut" class="grid"></div></div>
+      </section>
+    </div>
+  </div>
 </section>
 </main>
 
-<footer class="foot"><span>KababayanQueue &copy; 2026</span><span> Made for Filipino Gamers </span></footer>
+<!-- Floating footer: transparent, fixed -->
+<footer class="foot">
+  <span>KababayanQueue &copy; 2026 &middot; Made for Filipino Gamers</span>
+  <button type="button" class="link" data-terms>Terms and Conditions</button>
+</footer>
+
 <dialog id="dlg"></dialog>
 <div id="toast" role="status" aria-live="polite"></div>
-<script type="module" src="LFG-function.js"></script>
+<script type="module" src="LFG-function.js?v=4"></script>
 </body>
 </html>
